@@ -5,13 +5,13 @@ This fork documents development work conducted during the year 2025. The develop
 Improvement of parameters database module and data management system aiming to enhance user experience, data integrity, and code quality.
 
 ## Issues Addressed
-✅ Removing sub-climate selectInput on the Farm section. 
-✅ Improving user experience on the Crop inputs table. 
-✅ Improving parameters database tables navigation. 
-✅ Improving Feedtype table experience in the parameters database. 
-✅ Improving Feeditem table experience in the parameters database.
-✅ Changing variable names into more suited ones across the app.
-✅ Removing redudant variables from the code.
+- Removing sub-climate selectInput on the Farm section.
+- Improving user experience on the Crop inputs table.
+- Improving parameters database tables navigation.
+- Improving Feedtype table experience in the parameters database.
+- Improving Feeditem table experience in the parameters database.
+- Changing variable names into more suited ones across the app.
+- Removing redudant variables from the code.
 
 ## Datasets Major Changes
 1. lkp_feedtype
