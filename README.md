@@ -11,17 +11,17 @@ Below is a summary of the development changes:
 Improvement of parameters database module and data management system aiming to enhance user experience, data integrity, and code quality.
 
 ## Issues Addressed
-   - Removing sub-climate selectInput on the Farm section.
-   - Improving user experience on the Crop inputs table.
-   - Improving parameters database tables navigation.
-   - Improving Feedtype table experience in the parameters database.
-   - Improving Feeditem table experience in the parameters database.
-   - Changing variable names into more suited ones across the app.
-   - Removing redudant variables from the code.
+   - Removing sub-climate selectInput on the Farm section✅
+   - Improving user experience on the Crop inputs table✅
+   - Improving parameters database tables navigation✅
+   - Improving Feedtype table experience in the parameters database✅
+   - Improving Feeditem table experience in the parameters database✅
+   - Changing variable names into more suited ones across the app✅
+   - Removing redudant variables from the code✅
 
 ## Datasets Major Changes
 **1. lkp_feedtype**
-   ✅ Rename 'lkp_feedtype' to 'lkp_crops'.
+   - Rename 'lkp_feedtype' to 'lkp_crops'.
    - Renamed 'lkp_feedtype' to 'lkp_crops' in parameter database references.
    - Updated all 'lkp_feedtype()' calls to 'lkp_crops()' in server modules.
    - Renamed CSV files from 'lkp_feedtype.csv' to 'lkp_crops.csv'.
