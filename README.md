@@ -62,6 +62,7 @@ Improvement of parameters database module and data management system aiming to e
   
 **7. Improve parameters database tables navigation**
    - Froze column names for crop_name, feed_item_name and livestock_desc to enable visibility while scrolling through long horizontal bars.
+   - Added search functionality for fast querying of parameter data in crop, livetype and Feeditem lkp tables.
      
 **8. Help button**
    - updated link to the feedback form. 
