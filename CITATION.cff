@@ -6,34 +6,28 @@ type: software
 authors:
   - family-names: Jou
     given-names: Ahmed
-    affiliation: APPLITICS LC
-    role: author
+    affiliation: "APPLITICS"
 
- - family-names: Elaouni
+  - family-names: Elaouni
     given-names: Yassine
-    affiliation: APPLITICS LC
-    role: author
+    affiliation: "APPLITICS"
 
- - family-names: Bouchaib
+  - family-names: Bouchaib
     given-names: Nadim
-    affiliation: APPLITICS LC
-    role: author
+    affiliation: "APPLITICS"
 
   - family-names: Mwema
     given-names: Emmanuel
-    affiliation: Alliance Bioversity International - CIAT
-    role: contributor
+    affiliation: "Alliance Bioversity International - CIAT"
 
-  - family-names: Van dar Hoek
+  - family-names: "Van der Hoek"
     given-names: Rein
-    affiliation: Alliance Bioversity International - CIAT
-    role: contributor
+    affiliation: "Alliance Bioversity International - CIAT"
 
   - family-names: Notenbaert
     given-names: An
-    affiliation: Alliance Bioversity International - CIAT
-    role: contributor
+    affiliation: "Alliance Bioversity International - CIAT"
 
-repository-code: "https://github.com/M-Emmanuel/icleaned-development-batch-v2"
+repository-code: https://github.com/M-Emmanuel/icleaned-development-batch-v2
 version: "2025.1"
 date-released: 2026-01-27
