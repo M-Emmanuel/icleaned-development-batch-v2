@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+title: "CIAT/iCleaned_batch: iCLEANED Development Changes 2025"
+message: "If you use this software, please cite it as below."
+type: software
+
+authors:
+  - family-names: Jou
+    given-names: Ahmed
+    affiliation: APPLITICS LC
+    role: author
+
+ - family-names: Elaouni
+    given-names: Yassine
+    affiliation: APPLITICS LC
+    role: author
+
+ - family-names: Bouchaib
+    given-names: Nadim
+    affiliation: APPLITICS LC
+    role: author
+
+  - family-names: Mwema
+    given-names: Emmanuel
+    affiliation: Alliance Bioversity International - CIAT
+    role: contributor
+
+  - family-names: Van dar Hoek
+    given-names: Rein
+    affiliation: Alliance Bioversity International - CIAT
+    role: contributor
+
+  - family-names: Notenbaert
+    given-names: An
+    affiliation: Alliance Bioversity International - CIAT
+    role: contributor
+
+repository-code: "https://github.com/M-Emmanuel/icleaned-development-batch-v2"
+version: "2025.1"
+date-released: 2026-01-27
