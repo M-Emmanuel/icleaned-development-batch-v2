@@ -30,12 +30,12 @@ Improvement of parameters database module and data management system aiming to e
    - Automatically assign unique codes to new entries (when adding or cloning a row). Put checks to prevent having duplicates and show error.
   
 **2. lkp_feeditem.csv**
-   - Deleted column de.
-   - Deleted feed_type_code.
-   - Deleted extra comma causing V8, V9 columns.
-   - Renamed feed_type_code to crop_code.
-   - Reorder columns feed_item_code followed by crop_code and feed_item_name.
-   - Automatically assign unique codes to new entries (when adding or cloning a row). Put checks to prevent having duplicates and show error.
+   *🔴* Deleted column de.
+   *🔴* Deleted feed_type_code.
+   *🔴* Deleted extra comma causing V8, V9 columns.
+   *🔴* Renamed feed_type_code to crop_code.
+   *🔴* Reorder columns feed_item_code followed by crop_code and feed_item_name.
+   *🔴* Automatically assign unique codes to new entries (when adding or cloning a row). Put checks to prevent having duplicates and show error.
   
 **3. lkp_livetype.csv**
    - Renamed column proportion_growth to proportion_growth_piglets_milk.
