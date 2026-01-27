@@ -1,5 +1,12 @@
 # iCLEANED Development Work 2025
-This fork documents development work conducted during the year 2025. The development specifications include:
+This fork documents development work conducted during the year 2025.
+
+All development work conducted during 2025 is documented in the commit history.
+See the full list of commits here:
+
+👉 [View complete development commit history (2025)](https://github.com/CIAT/icleaned/compare/staging...APPLITICS:icleaned:feature/tables-ux-improvements)
+
+Below is a summary of the development changes:
 
 ## Feature/tables ux improvements
 Improvement of parameters database module and data management system aiming to enhance user experience, data integrity, and code quality.
@@ -47,7 +54,8 @@ Improvement of parameters database module and data management system aiming to e
    - Deleted lkp_climate2.csv.
 
 5. Data quality checks
-   - Imposed data-quality checks in the Livestock Feeding section and Area, Manure and Waste tabs in the Farm Section.
+   - Imposed data-quality checks in the Area, Manure and Waste tabs in the Farm Section as well as in the Livestock Feeding section.
+   - Add validation warnings for crop areas and residue management table
 
 6. Crop inputs table
    - Blocked editing for fertilizer columns that were not added.
@@ -55,6 +63,7 @@ Improvement of parameters database module and data management system aiming to e
   
 7. Improve parameters database tables navigation
    - Froze column names for crop_name, feed_item_name and livestock_desc to enable visibility while scrolling through long horizontal bars.
-9. Help button
+     
+8. Help button
    - updated link to the feedback form. 
 ---
