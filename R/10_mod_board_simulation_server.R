@@ -140,13 +140,16 @@ board_simulation_server <- function(
     cat(file = stderr(), "10 - Display warning text\n")
     shinyjs::hide(selector = jns("warning_scenario_text"))
     # according to the scenario data
-    if (!is.null(input$scenario_name)) {
-      warning_msg <- readRDS(
-        file.path(
-          session$userData$user_folder, "scenarios",
-          input$scenario_name, "scenario_data.rds"
-        )
-      )$warning_msg
+    # (a new user has no scenario yet: nothing to read; reading a missing file
+    # in an observer would end the session - "Disconnected from the server")
+    scenario_file <- if (!is.null(input$scenario_name) && nzchar(input$scenario_name)) {
+      file.path(
+        session$userData$user_folder, "scenarios",
+        input$scenario_name, "scenario_data.rds"
+      )
+    }
+    if (!is.null(scenario_file) && file.exists(scenario_file)) {
+      warning_msg <- readRDS(scenario_file)$warning_msg
       if (!is.null(warning_msg$warning_text)) {
         shinyjs::show(id = "warning_scenario_text")
         shinyjs::html(

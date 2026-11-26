@@ -98,17 +98,14 @@ board_comparison_server <- function(
   # ------ Update Radio Buttons according to selected results ------------------
   observeEvent(input$comp_name, {
     cat(file = stderr(), "20 - Update Radio Buttons on selected results\n")
-    # Read the scenario names from the result rds file
-    scenario_names <- names(
-      readRDS(
-        file.path(
-          session$userData$user_folder,
-          "comparisons",
-          input$comp_name,
-          "results_list.rds"
-        )
-      )
+    # Read the scenario names from the result rds file (none yet for a new
+    # user: reading a missing file here would end the session)
+    comp_file <- file.path(
+      session$userData$user_folder, "comparisons",
+      input$comp_name %||% "", "results_list.rds"
     )
+    req(nzchar(input$comp_name %||% ""), file.exists(comp_file))
+    scenario_names <- names(readRDS(comp_file))
     updateRadioButtons(
       inputId = "base_scenario",
       choices = scenario_names,
