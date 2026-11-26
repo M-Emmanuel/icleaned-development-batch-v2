@@ -624,6 +624,9 @@ caption {
   background: #2874A6 !important;
 }
 
+.LegendText.legend-dynamic:before{
+  background: var(--legend-color) !important;
+}
 .LegendText:after {
   content: none !important;
 }
@@ -636,6 +639,7 @@ caption {
 table.dataTable thead th, table.dataTable thead td, table.dataTable tfoot th, table.dataTable tfoot td {
     color: #005275;
     font-family: 'Merriweather';
+    background-color: #f5f5f5;
 }
 table.dataTable th.dt-right, table.dataTable td.dt-right{
     text-align: left;
@@ -667,6 +671,15 @@ table.dataTable {
     > thead > tr > td:not(:first-child),
     > tbody > tr > td:not(:first-child) {
       min-width: $common-width;
+    }
+    
+    /* Reduce width for code column (second column after checkbox) */
+    > thead > tr > th:nth-child(2),
+    > thead > tr > td:nth-child(2),
+    > tbody > tr > td:nth-child(2) {
+      width: 120px;
+      min-width: 120px;
+      max-width: 120px;
     }
   }
 }
@@ -703,11 +716,44 @@ table tbody tr{
 .dataTables_wrapper {
     overflow-x: auto;
 }
+
+/* Style the header scrollbar to match header background */
+.dataTables_scrollHead {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    
+    /* Chrome, Safari, Opera */
+    &::-webkit-scrollbar {
+        width: 17px;
+    }
+    
+    &::-webkit-scrollbar-track,
+    &::-webkit-scrollbar-thumb {
+        background-color: #f5f5f5;
+        border: none;
+    }
+    
+    &::-webkit-scrollbar-button {
+        display: none;
+    }
+}
+
+/* Hide the FixedColumns top-right blocker */
+.dtfc-right-top-blocker {
+    display: none !important;
+}
+
 table.dataTable thead tr>.dtfc-fixed-left {
     background-color: #f5f5f5;
 }
 table.dataTable tbody tr>.dtfc-fixed-left{
     background-color: #ebeff1;
+}
+
+/* Ensure search row in fixed column matches main header */
+.dtfc-fixed-left thead tr.search-row th {
+    background-color: #f5f5f5 !important;
+    padding: 2px !important;
 }
 .modal-dialog:not(.modal-lg) {
     max-width: 60%; 
@@ -1406,71 +1452,6 @@ table.dataTable tbody tr>.dtfc-fixed-left{
   }
 }
 
-
-// ------ Compact Pagination Bar (centered + scaled) --------------------------
-
-.pagination-bar-container {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px; // spacing between buttons
-  padding-right: 4px;
-
-  // Base button style
-  .btn {
-    font-size: 13px !important;
-    width: 34px;
-    height: 32px;
-    padding: 0 !important;
-    line-height: 32px;
-    border-radius: 6px;
-    border: 1px solid #005275 !important;
-    color: #005275 !important;
-    background-color: transparent !important;
-    text-align: center;
-    vertical-align: middle;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease-in-out;
-
-    // Arrow icons
-    i,
-    svg {
-      font-size: 15px !important;
-      line-height: 1;
-      vertical-align: middle;
-    }
-
-    // Hover state for unselected buttons
-    &:hover {
-      background-color: #005275 !important;
-      color: #fff !important;
-    }
-
-    // Active (selected) page
-    &.btn-primary,
-    &.fw-bold {
-      background-color: #e5e9ea !important;
-      color: #005275 !important;
-      border-color: #00527533 !important;
-      box-shadow: inset 0 0 0 1px #0052751a;
-
-      &:hover {
-        background-color: #e5e9ea !important;
-      }
-    }
-  }
-
-  // Ellipsis
-  .text-muted {
-    font-size: 13px;
-    opacity: 0.7;
-    margin: 0 4px;
-    line-height: 32px;
-  }
-}
-
 :root {
   // Default sizing constraints used by all Bootstrap-select menus
   --picker-min-height: 96px;             // ensure a usable scroll pane
@@ -1555,3 +1536,214 @@ table.dataTable tbody tr>.dtfc-fixed-left{
     padding: calc(2rem + 1vw) calc(2.5rem + 1vw); /* proportional padding */
   }
 }
+
+/* ========================================  */
+/* ======= DATATABLE COLUMN SEARCH =======  */
+/* ========================================  */
+
+/* Styles for the second header row containing column search inputs */
+table.dataTable thead tr:nth-child(2) th {
+  vertical-align: bottom !important;
+  padding: 2px !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+  background-color: #f5f5f5 !important;
+  overflow: hidden !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+
+  /* Search input field styling */
+  input[type="text"] {
+    width: 100% !important;
+    padding: 4px 8px !important;
+    margin: 0 !important;
+    border: 1px solid #005275 !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    box-sizing: border-box !important;
+    color: #005275 !important;
+
+    /* Focus state styling */
+    &:focus {
+      border: 2px solid #005275 !important;
+      outline: none !important;
+      padding: 3px 7px !important;
+    }
+  }
+}
+
+/* Fix first column search cell to stay with fixed column */
+table.dataTable thead tr.search-row th:first-child {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 3 !important;
+  background-color: #f5f5f5 !important;
+}
+
+/* Hide the global DataTables search filter */
+.dataTables_filter {
+  display: none !important;
+}
+
+/* =====================  */ 
+/* ==== CROP NAME =====  */ 
+/* =====================  */ 
+.crop-name-cell {
+    cursor: pointer;
+    color: #005275;
+    text-align: left !important;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+/* ===============================  */
+/* ====== Batch processing =======  */
+/* ===============================  */
+
+.batch-page {
+  .batch-title { font-size: 1.6rem; color: $primary; margin-bottom: 4px; }
+  .batch-lead { font-size: 1.05rem; max-width: 720px; }
+  .batch-hint { color: #5f6b72; font-size: 0.9rem; }
+  .batch-locked { color: #5f6b72; margin: 0; }
+  .card { padding: 28px 32px; }
+  .card h2 { font-size: 1.2rem; }
+  h3 { font-size: 1rem; font-weight: 700; margin-top: 12px; }
+
+  // Step cards
+  .batch-step { scroll-margin-top: 20px; }
+  // brief highlight of the step to act on next
+  .batch-flash:after { animation: batch-flash 1.6s ease-out; }
+  @keyframes batch-flash { 0% { box-shadow: 0 0 0 4px #009ADB, 0 0 30px #0000004D; } 100% { box-shadow: 0 0 30px #0000004D; } }
+  .batch-step-number {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; margin-right: 12px; flex-shrink: 0;
+    background: $primary; color: #fff; font-weight: 700;
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  }
+  .batch-details summary { cursor: pointer; color: $primary; font-weight: 600; }
+  .batch-defaults { font-size: 0.85rem; margin-top: 8px; }
+  .batch-alert { border-radius: 0; margin-bottom: 0;
+    // (the app's alert style sets every child's font; keep the icon font)
+    .fa, .fas, .fa-solid, i[class^="fa"] { font-family: "Font Awesome 6 Free" !important; font-weight: 900 !important; } }
+  .batch-problems td { vertical-align: top; }
+  .batch-problems code { color: #33434c; background: $light; padding: 0 3px; word-break: break-all; }
+
+  // File facts after upload
+  .batch-file-name { font-weight: 700; margin: 4px 0 6px; }
+  .batch-facts {
+    display: flex; flex-wrap: wrap; gap: 6px 8px; list-style: none; padding: 0; margin: 0 0 12px;
+    li { background: $light; padding: 3px 10px; font-size: 0.9rem; }
+  }
+
+  // Status chips: always icon or word + colour, never colour alone
+  .batch-chip {
+    display: inline-block; padding: 1px 8px; font-size: 0.8rem; font-weight: 600;
+    background: #e9eef1; color: #33434c; white-space: nowrap;
+  }
+  .batch-chip.batch-chip-wrap { white-space: normal; font-weight: 500; }
+  .batch-chip-error, .batch-chip-needs_fixes, .batch-chip-failed { background: #fbe3dd; color: #8a2a12; }
+  .batch-chip-warning, .batch-chip-interrupted, .batch-chip-cancelled { background: #fff1cc; color: #6b4e00; }
+  .batch-chip-done, .batch-chip-checked { background: #e5f2d6; color: #3c5a14; }
+  .batch-chip-running { background: #dcf0fa; color: #004a6b; }
+  .batch-count {
+    display: inline-block; margin-left: 6px; padding: 0 7px; font-size: 0.75rem;
+    background: $danger; color: #fff; border-radius: 10px;
+    &.batch-count-note { background: #e0a800; color: #3d2e00; }
+  }
+
+  // Run
+  .batch-run-summary { background: $light; padding: 12px 14px; margin: 8px 0 14px; }
+  .batch-run-btn { padding: 10px 28px; font-weight: 700; }
+  .batch-progress { height: 22px; border-radius: 0; background: #e9eef1;
+    .progress-bar { background: $primary; font-weight: 700; } }
+  .batch-progress-text { font-size: 0.95rem; margin-bottom: 6px; gap: 12px; }
+
+  // Results
+  .batch-tiles { display: flex; flex-wrap: wrap; gap: 12px; }
+  .batch-tile {
+    flex: 1 1 130px; background: $light; padding: 12px 16px; border-left: 4px solid $primary;
+    .batch-tile-value { font-size: 1.6rem; font-weight: 700; color: $primary; line-height: 1.2; }
+    .batch-tile-label { font-size: 0.85rem; color: #5f6b72; }
+    &.batch-tile-error { border-left-color: $danger; .batch-tile-value { color: #b5361a; } }
+    &.batch-tile-warning { border-left-color: #e0a800; }
+  }
+  .batch-issues { padding-left: 18px; li { margin-bottom: 4px; } }
+
+  // Stepper
+  .batch-stepper {
+    display: flex; list-style: none; padding: 0; margin: 0 0 24px; gap: 4px; counter-reset: none;
+    li { flex: 1; padding: 0; margin: 0; &:before { content: none; display: none; } }
+    a {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: #fff; color: #5f6b72; text-decoration: none; border-bottom: 3px solid #d5dde2;
+      height: 100%;
+    }
+    a:hover, a:focus-visible { background: #eef5f9; }
+    .batch-stepper-dot {
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: 50%; background: #d5dde2; color: #33434c;
+      font-weight: 700; font-size: 0.85rem;
+    }
+    .batch-stepper-label { font-weight: 600; font-size: 0.95rem; }
+    .batch-stepper-done a { color: $primary; border-bottom-color: $primary; }
+    .batch-stepper-done .batch-stepper-dot { background: $primary; color: #fff; }
+    .batch-stepper-current a, .batch-stepper-running a { color: #222; border-bottom-color: #009ADB; }
+    .batch-stepper-current .batch-stepper-dot, .batch-stepper-running .batch-stepper-dot { background: #009ADB; color: #fff; }
+    .batch-stepper-attention a { color: #8a2a12; border-bottom-color: $danger; }
+    .batch-stepper-attention .batch-stepper-dot { background: $danger; color: #fff; }
+  }
+
+  // Your batches
+  .batch-history { position: sticky; top: 16px; }
+  .batch-history-list {
+    list-style: none; padding: 0; margin: 0;
+    li { display: flex; align-items: stretch; border-bottom: 1px solid #e3e8eb; }
+    li.active { background: #eef5f9; box-shadow: inset 3px 0 0 $primary; }
+  }
+  .batch-history-item {
+    flex: 1; text-align: left; background: none; border: none; padding: 10px 8px; color: inherit;
+    &:hover, &:focus-visible { background: #f3f7f9; }
+  }
+  .batch-history-name { font-weight: 700; color: $primary; word-break: break-word; }
+  .batch-history-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 0.8rem; color: #5f6b72; margin-top: 3px; }
+  .batch-history-delete {
+    background: none; border: none; color: #8a979e; padding: 0 10px;
+    &:hover, &:focus-visible { color: $danger; }
+  }
+
+  // Checkboxes in the app colour (red is kept for problems)
+  .checkbox input + span { color: $text; font-size: 1rem;
+    &:before { border-color: $primary !important; } &:after { border-color: $primary !important; } }
+
+  // The main action of each step stands out
+  .btn-primary { background-color: $primary; border-color: $primary; color: #fff;
+    &:hover, &:focus { background-color: #003d58; border-color: #003d58; color: #fff; } }
+  .btn-primary.disabled, .btn-primary:disabled { background-color: #9fb3bd; border-color: #9fb3bd; }
+
+  // Matching farmers' answers and farm conditions
+  .batch-match-table, .batch-conditions-table {
+    td, th { vertical-align: middle; }
+    .form-group { margin-bottom: 0; }
+  }
+  .batch-match-done { margin-top: 8px; }
+  .batch-conditions-table th { font-weight: 600; font-size: 0.9rem; }
+  .batch-conditions-table td { font-size: 0.9rem; }
+  .batch-default { color: #8a979e; }
+  .batch-conditions { border-top: 1px solid #e3e8eb; padding-top: 16px; }
+
+  // Keyboard focus is always visible
+  a:focus-visible, button:focus-visible, summary:focus-visible, .form-control:focus, .form-select:focus {
+    outline: 3px solid #009ADB; outline-offset: 2px;
+  }
+}
+
+@media (max-width: 991px) {
+  .batch-page .batch-stepper { flex-direction: column; }
+  .batch-page .batch-history { position: static; margin-top: 16px; }
+}
+
+// What's missing (Batch page): values used for what the farms left blank
+.batch-missing-table .batch-value { text-decoration: none; border-bottom: 1px dashed currentColor; }
+.batch-missing-table .batch-value-changed { font-weight: 600; }
+.batch-missing details > summary { cursor: pointer; }

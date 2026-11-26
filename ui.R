@@ -22,6 +22,8 @@ ui <- fluidPage(
   includeScript("www/js/bg-modal.js"), # Change backdrop modal
   # Add JS code to freeze the horizontal scroll on table edit
   includeScript("www/js/horizontal-scroll.js"),
+  # Add JS handler for vertical scroll (auto-jump to new rows)
+  includeScript("www/js/vertical-scroll.js"),
   includeScript("www/js/auth-url-cleanup.js"), # Clean the URL after login
   #   # ------ Header ----------------------------------------------------------
   tags$header(
@@ -61,6 +63,15 @@ ui <- fluidPage(
               id = "link_board",
               "Dashboard",
               onclick = go_to(target = "board")
+            )
+          ),
+          if (batch_processing_enabled()) tags$li(
+            class = "nav-item",
+            a(
+              class = "nav-link",
+              id = "link_batch",
+              "Batch",
+              onclick = go_to(target = "batch")
             )
           ),
           tags$li(
@@ -134,8 +145,7 @@ ui <- fluidPage(
             id = "maj_helper_btn",
             tags$a(
               href = paste0(
-                "https://docs.google.com/document/d/1MmQ1r_IK6mEi4pbBVXJ0pZqKRsvdGTv4/",
-                "edit?usp=sharing&ouid=102650625222330231063&rtpof=true&sd=true"
+                "https://hdl.handle.net/10568/180489"
               ),
               target = "_blank",  # Opens in a new tab
               class = "btn btn-blue",  # Use Bootstrap classes if needed
@@ -150,25 +160,33 @@ ui <- fluidPage(
     )
   ),
   # ------ Tab Panels with different modules -----------------------------------
-  tabsetPanel(
-    id = "tabcontent", 
-    type = "hidden",
-    tabPanelBody(
-      value = "scenario",
-      scenario_ui("scenario")
+  do.call(tabsetPanel, c(
+    list(id = "tabcontent", type = "hidden"),
+    list(
+      tabPanelBody(
+        value = "scenario",
+        scenario_ui("scenario")
+      ),
+      tabPanelBody(
+        value = "params_db",
+        params_db_ui("params_db")
+      )
     ),
-    tabPanelBody(
-      value = "params_db",
-      params_db_ui("params_db")
-    ),
-    tabPanelBody(
-      value = "board",
-      fixedPage(
-        board_simulation_ui("board"),
-        board_comparison_ui("board")
+    # Batch processing page, shown when ICLEANED_BATCH=true
+    if (batch_processing_enabled()) list(tabPanelBody(
+      value = "batch",
+      batch_ui("batch")
+    )),
+    list(
+      tabPanelBody(
+        value = "board",
+        fixedPage(
+          board_simulation_ui("board"),
+          board_comparison_ui("board")
+        )
       )
     )
-  ),
+  )),
   # ------ Footer --------------------------------------------------------------
   div(
     class = "footer bg-primary",

@@ -12,10 +12,26 @@ library(shinyalert)
 library(httr)
 
 # TODO: use RENV!
+# (CLEANED_GITHUB: the GitHub repository and branch of the CLEANED package to
+# install when it is missing, e.g. "M-Emmanuel/cleaned@batch-testing")
 if (!requireNamespace("cleaned", quietly = TRUE)) {
-  remotes::install_github("CIAT/cleaned@cleaned_v0.6.0")
+  remotes::install_github(Sys.getenv("CLEANED_GITHUB", "CIAT/cleaned@cleaned_v0.6.0"))
 }
 library(cleaned)
+
+# Test deployments (e.g. shinyapps.io): with ICLEANED_DATA_INIT=true the data
+# folder (DATA_DIR, by default "icleaned_data" in the app folder) and its
+# sub-folders are created at start-up. Such a folder is temporary: it is emptied
+# whenever the server restarts or the app is published again.
+if (tolower(Sys.getenv("ICLEANED_DATA_INIT", "false")) %in% c("true", "1", "yes")) {
+  local({
+    data_dir <- Sys.getenv("DATA_DIR", "icleaned_data")
+    for (d in c("Users", "Onboarding", "shared_pool/study_objects", "shared_pool/parameters_database")) {
+      dir.create(file.path(data_dir, d), recursive = TRUE, showWarnings = FALSE)
+    }
+    Sys.setenv(DATA_DIR = normalizePath(data_dir))
+  })
+}
 
 options(
   spinner.color = "#005275",
@@ -39,10 +55,26 @@ Sys.setlocale("LC_TIME", "C")  # Set to C locale for English
 # Ideally, user {renv} package to manage the package versions
 
 
+# Names of default (read-only) parameters databases - subfolders of data/primary_database.
+# Users can only clone these, not edit or delete them.
+primary_database_names <- function() {
+  list.files(file.path("data", "primary_database"), full.names = FALSE)
+}
+
+# Default parameters database: clone source for new DBs and template scenarios.
+default_parameters_database <- "Southern Highland Tanzania Dairy"
+
+# Parameters database of batch processing: one long list of the livestock
+# types, feeds and crops of all the databases above (cleaned::build_batch_database).
+batch_database_name <- "Batch parameters (all regions)"
+
+# Display name for user-created parameter databases (versioned on duplicate).
+new_parameters_database_name <- "New Parameters Database"
+
 # List of all parameter tables
 parameters_db_names <- c(
   "lkp_climate", "lkp_climate2", "lkp_croplandsystem", "lkp_feeditem",
-  "lkp_feedtype", "lkp_grassinputlevel", "lkp_grasslandman", "lkp_landcover",
+  "lkp_crops", "lkp_grassinputlevel", "lkp_grasslandman", "lkp_landcover",
   "lkp_livetype", "lkp_manureman", "lkp_organicmatter", "lkp_orgfertilizer",
   "lkp_region", "lkp_slope", "lkp_soil", "lkp_tillageregime"
 )

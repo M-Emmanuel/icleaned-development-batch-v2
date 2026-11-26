@@ -1,0 +1,13 @@
+{
+  "type": "batch long list",
+  "built": "2026-11-12",
+  "from": ["Central Uganda - Livestock General", "Ecuador-National dual-purpose cattle", "Ethiopia - Small Ruminants", "Haiti - Mixed Livestock", "Honduras-Olancho dual-purpose cattle", "Mongolia - Livestock General", "Nepal - Goat Fattening", "Nicaragua-National dual-purpose cattle", "North-west-highlands Vietnam - Multispecies", "Northern Tanzania - Dairy", "Southern Highland Tanzania Dairy", "Tunisia - National livestock general", "Uzbekistan - Mixed livestock", "Western Kenya - Dairy"],
+  "counts": {
+    "livestock_types": 26,
+    "feeds": 184,
+    "crops": 129,
+    "feed_defaults": 2,
+    "crop_defaults": 1
+  },
+  "conflicts": 87
+}

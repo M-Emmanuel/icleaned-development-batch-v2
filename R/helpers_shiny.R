@@ -11,17 +11,15 @@
 #' @examples
 #' go_to("tabcontent", "tab")
 go_to <- function(tab, target) {
+    # (the server marks the menu link of the open page as active)
     glue::glue(
         "$('#tabcontent').data('shiny-input-binding').setValue($('#tabcontent'), '{target}');",
-        if (target == "scenario") {
-            # Hide id "maj_helper_btn"
-            "$('#maj_helper_btn').hide();"
-        } else if (target == "params_db") {
-            # Hide id "maj_helper_btn"
-            "$('#maj_helper_btn').hide();"
-        } else if (target == "board") {
+        if (target == "board") {
             # Show id "maj_helper_btn"
             "$('#maj_helper_btn').show();"
+        } else {
+            # Hide id "maj_helper_btn"
+            "$('#maj_helper_btn').hide();"
         }
     )
 }
@@ -103,6 +101,34 @@ generate_legend <- function(class, id, ns, n_items, id_item_prefix) {
       ),
       column(1)
     )
+  )
+}
+
+#' Build legend items with their own colours
+#'
+#' Creates the two-column legend content for any number of items; each item's
+#' colour dot is set inline (see `.legend-dynamic` in app.scss).
+#'
+#' @param labels Character vector of legend labels
+#' @param colors Character vector of colours, one per label
+#'
+#' @return A Shiny tag with the legend items
+legend_items <- function(labels, colors) {
+  item <- function(i) {
+    p(
+      class = "legend-text LegendText legend-dynamic",
+      style = paste0("--legend-color: ", colors[i], ";"),
+      labels[i]
+    )
+  }
+  left <- seq_along(labels)[c(TRUE, FALSE)]
+  right <- seq_along(labels)[c(FALSE, TRUE)]
+  fluidRow(
+    style = "width: 100%;",
+    column(1),
+    column(5, lapply(left, item)),
+    column(5, lapply(right, item)),
+    column(1)
   )
 }
 
@@ -249,6 +275,57 @@ activate_statcounter <- function(sc_project, sc_security, user_id, url_hostname,
         ")))
     )
   )
+}
+
+#' Sync columns from a parameters-database table into a scenario state table
+#'
+#' Refreshes a scenario reactive (e.g. `feedtype()`, `livestock_data()`) with
+#' the latest values coming from a parameters-database table (e.g.
+#' `lkp_crops()`, `lkp_feeditem()`, `lkp_livetype()`). Rows are matched on
+#' `key`; only the columns listed in `columns` are overwritten. Columns not
+#' listed are preserved, so any user-edited values in the scenario survive.
+#'
+#' Rows of `target` whose key has no match in `source` are left untouched: we
+#' never erase scenario data because a row was deleted from the parameters DB.
+#'
+#' @param target  Data frame to update (scenario state).
+#' @param source  Data frame holding the up-to-date values (parameters DB).
+#' @param key     Name of the column used to match rows between target and
+#'                source.
+#' @param columns Character vector of columns to copy from source to target.
+#'                When `columns` is named, names are the target column names
+#'                and values are the source column names, which allows mapping
+#'                between differently-named columns. Columns missing on either
+#'                side are silently skipped.
+#'
+#' @return The updated target data frame.
+sync_columns_by_key <- function(target, source, key, columns) {
+  if (is.null(target) || is.null(source)) return(target)
+  if (nrow(target) == 0 || nrow(source) == 0) return(target)
+  if (!(key %in% names(target)) || !(key %in% names(source))) return(target)
+
+  # Resolve target/source column pairs (support named vectors for renaming)
+  if (is.null(names(columns))) {
+    target_cols <- columns
+    source_cols <- columns
+  } else {
+    target_cols <- ifelse(names(columns) == "", columns, names(columns))
+    source_cols <- unname(columns)
+  }
+
+  match_idx <- match(target[[key]], source[[key]])
+  matched <- !is.na(match_idx)
+  if (!any(matched)) return(target)
+
+  for (i in seq_along(columns)) {
+    tc <- target_cols[i]
+    sc <- source_cols[i]
+    if (sc %in% names(source) && tc %in% names(target)) {
+      # Use [[ on source so this works the same for data.frame and data.table
+      target[matched, tc] <- source[[sc]][match_idx[matched]]
+    }
+  }
+  target
 }
 
 # Temporarily freeze and unfreeze table scrolling after table editing

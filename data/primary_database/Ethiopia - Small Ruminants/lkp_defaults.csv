@@ -1,0 +1,52 @@
+section,field,value,description
+farm,region,AFRICA,Placeholder from Pastoral_baseline.xlsx - review
+farm,climate_zone_2,Tropical Dry,Placeholder from Pastoral_baseline.xlsx - review
+farm,soil_description,Nitosol,Placeholder from Pastoral_baseline.xlsx - review
+farm,soil_k_value,0.15,Value used in Pastoral_baseline.xlsx (lkp_soil gives 0.25 for Nitosol) - review
+farm,annual_prec,828,Placeholder from Pastoral_baseline.xlsx - review
+farm,rain_length,6,Placeholder from Pastoral_baseline.xlsx - review
+farm,soil_n,0.77,Placeholder from Pastoral_baseline.xlsx - review
+farm,soil_c,7.1,Placeholder from Pastoral_baseline.xlsx - review
+farm,soil_clay,59.7,Placeholder from Pastoral_baseline.xlsx - review
+farm,soil_bulk,1.17,Placeholder from Pastoral_baseline.xlsx - review
+farm,soil_depth,1.5,Placeholder from Pastoral_baseline.xlsx - review
+farm,et,1643,Placeholder from Pastoral_baseline.xlsx - review
+farm,cropland_system,"Long term cultivated, tropical, dry",Placeholder from Pastoral_baseline.xlsx - review
+farm,cropland_tillage,"Reduced, tropical, dry",Placeholder from Pastoral_baseline.xlsx - review
+farm,cropland_orgmatter,"Low, tropical, dry",Placeholder from Pastoral_baseline.xlsx - review
+farm,grassland_management,"Moderately degraded grassland, tropical",Placeholder from Pastoral_baseline.xlsx - review
+farm,grassland_implevel,None,Placeholder from Pastoral_baseline.xlsx - review
+farm,purchased_manure,0,Placeholder from Pastoral_baseline.xlsx - review
+farm,purchased_compost,0,Placeholder from Pastoral_baseline.xlsx - review
+farm,purchased_organic_n,0,Placeholder from Pastoral_baseline.xlsx - review
+farm,purchased_bedding,0,Placeholder from Pastoral_baseline.xlsx - review
+farm,waste_production_milk,3,Placeholder from Pastoral_baseline.xlsx - review
+farm,waste_production_meat,3,Placeholder from Pastoral_baseline.xlsx - review
+farm,waste_distribution_milk,3,Placeholder from Pastoral_baseline.xlsx - review
+farm,waste_distribution_meat,3,Placeholder from Pastoral_baseline.xlsx - review
+farm,waste_processing_milk,5,Placeholder from Pastoral_baseline.xlsx - review
+farm,waste_processing_meat,5,Placeholder from Pastoral_baseline.xlsx - review
+farm,waste_consume_milk,2,Placeholder from Pastoral_baseline.xlsx - review
+farm,waste_consume_meat,2,Placeholder from Pastoral_baseline.xlsx - review
+farm,grassland_toarable,0,Placeholder from Pastoral_baseline.xlsx - review
+farm,arable_tograssland,0,Placeholder from Pastoral_baseline.xlsx - review
+season,Annual,365,Season name and length (days); add one row per season
+livestock,annual_milk,0,
+livestock,annual_wool,0,
+livestock,annual_growth,0,
+livestock,work_hour,0,
+livestock,piglets_relying_on_milk,0,
+livestock,time_in_stable,0,
+livestock,time_in_non_roofed_enclosure,0,
+livestock,time_in_onfarm_grazing,0,
+livestock,time_in_offfarm_grazing,0,
+livestock,manure_in_stable,0,
+livestock,manure_in_non_roofed_enclosure,0,
+livestock,manure_in_field,0,
+livestock,manure_onfarm_fraction,0,
+livestock,manure_sales_fraction,0,
+livestock,distance_to_pasture,0,
+livestock,manureman_stable,,No default: must be given per farm when time in this location > 0
+livestock,manureman_non_roofed_enclosure,,No default: must be given per farm when time in this location > 0
+livestock,manureman_onfarm_grazing,,No default: must be given per farm when time in this location > 0
+livestock,manureman_offfarm_grazing,,No default: must be given per farm when time in this location > 0

@@ -1,0 +1,27 @@
+livetype_code,livetype_desc,species,animal_class,body_weight,body_weight_weaning,body_weight_year_one,adult_weight,litter_size,lactation_length,proportion_growth_piglets_milk,lw_gain_piglets,cp_maintenance,cp_lys_pregnancy,cp_lactmilk,cp_lys_growth,birth_interval,protein_milkcontent,fat_milkcontent,energy_milkcontent,energy_meatcontent,protein_meatcontent,carcass_fraction,n_manure_content,meat_product,milk_product,ipcc_ef_category_t2,ipcc_manure_ch4_category,ipcc_n_loss_category,ipcc_prp_category
+1,Cattle - Cows dry/pregnant (local),Cattle,Cows,350,0,0,350,0,0,0,0,0.35,9.64,0.09,0,1.5,3.2,5.8,970,2200,26,0.49,0.029,beef,cow milk,Dairy cows,Dairy cattle,Dairy Cow,"Cattle, pigs and poultry"
+2,Cattle - Cows lactating/pregnant (local),Cattle,Cows,350,0,0,350,0,0,0,0,0.35,9.64,0.09,0,1.5,3.2,5.8,970,2200,26,0.49,0.029,beef,cow milk,Dairy cows,Dairy cattle,Dairy Cow,"Cattle, pigs and poultry"
+3,Cattle - Cows dry/pregnant (improved),Cattle,Cows,600,0,0,600,0,0,0,0,0.6,12.21,0.09,0,1.166666667,3.7,4.3,970,2200,26,0.46,0.029,beef,cow milk,Dairy cows,Dairy cattle,Dairy Cow,"Cattle, pigs and poultry"
+4,Cattle - Cows lactating/pregnant (improved),Cattle,Cows,600,0,0,600,0,0,0,0,0.6,12.21,0.09,0,1.166666667,3.7,4.3,970,2200,26,0.46,0.029,beef,cow milk,Dairy cows,Dairy cattle,Dairy Cow,"Cattle, pigs and poultry"
+5,Cattle - Cows dry/pregnant (high productive),Cattle,Cows,600,0,0,600,0,0,0,0,0.6,15,0.09,0,1.166666667,3.7,4,970,2200,26,0.45,0.029,beef,cow milk,Dairy cows,Dairy cattle,Dairy Cow,"Cattle, pigs and poultry"
+6,Cattle - Cows lactating/pregnant (high productive),Cattle,Cows,600,0,0,600,0,0,0,0,0.6,15,0.09,0,1.166666667,3.7,4,970,2200,26,0.45,0.029,beef,cow milk,Dairy cows,Dairy cattle,Dairy Cow,"Cattle, pigs and poultry"
+7,Cattle - Adult male,Cattle,Adult males,580,0,0,580,0,0,0,0,0.58,0,0,0,0,0,0,0,2200,26,0.48,0.029,beef,cow milk,Non-dairy,Other cattle,Other Cattle,"Cattle, pigs and poultry"
+8,Cattle - Steers/heifers,Cattle,Young stock,200,0,0,350,0,0,0,0,0.2,0,0,0.4,0,0,0,0,2200,26,0.48,0.029,beef,cow milk,Non-dairy,Other cattle,Other Cattle,"Cattle, pigs and poultry"
+9,Cattle - Steers/heifers (improved),Cattle,Young stock,300,0,0,600,0,0,0,0,0.3,0,0,0.4,0,0,0,0,2200,26,0.49,0.029,beef,cow milk,Non-dairy,Other cattle,Other Cattle,"Cattle, pigs and poultry"
+10,Cattle - Steers/heifers (high productive),Cattle,Young stock,300,0,0,600,0,0,0,0,0.3,0,0,0.4,0,0,0,0,2200,26,0.49,0.029,beef,cow milk,Non-dairy,Other cattle,Other Cattle,"Cattle, pigs and poultry"
+11,Cattle - Calves,Cattle,Young stock,90,0,0,350,0,0,0,0,0.09,0,0,0.4,0,0,0,0,2200,26,0.49,0.029,beef,cow milk,Non-dairy,Other cattle,Other Cattle,"Cattle, pigs and poultry"
+12,Cattle - Calves (improved),Cattle,Young stock,90,0,0,600,0,0,0,0,0.09,0,0,0.4,0,0,0,0,2200,26,0.52,0.029,beef,cow milk,Non-dairy,Other cattle,Other Cattle,"Cattle, pigs and poultry"
+13,Buffalo - Cows,Buffalo,Cows,450,0,0,450,0,0,0,0,0.45,9.64,0.09,0,1.2,3.7,4.3,970,2200,26,0.58,0.029,buffalo,buffalo milk,Dairy cows,Buffalo,Other animals,"Cattle, pigs and poultry"
+14,Buffalo - Steers/heifers,Buffalo,Young stock,270,0,0,450,0,0,0,0,0.27,0,0,0.4,0,0,0,0,2200,26,0.58,0.029,buffalo,buffalo milk,Non-dairy,Buffalo,Other animals,"Cattle, pigs and poultry"
+15,Buffalo - Calves,Buffalo,Young stock,110,0,0,450,0,0,0,0,0.11,0,0,0.4,0,0,0,0,2200,26,0.58,0.029,buffalo,buffalo milk,Non-dairy,Buffalo,Other animals,"Cattle, pigs and poultry"
+16,Sheep - Ewes,Sheep,Ewes,53,10,30,53,0,60,0,0,0.106,8.374,0.09,0,1,3.2,5.8,970,2200,25,0.5,0.027,mutton,sheep milk,Sheep,Sheep,Other animals,Sheep and other animals
+17,Sheep - Breeding Rams,Sheep,Breeding rams,30,10,30,53,0,0,0,0,0.06,0,0,0.45,0,0,0,0,2200,25,0.5,0.027,mutton,sheep milk,Sheep,Sheep,Other animals,Sheep and other animals
+18,Sheep - Fattening Rams,Sheep,Fattening rams,20,10,30,53,0,0,0,0,0.04,0,0,0.45,0,0,0,0,2200,25,0.5,0.027,mutton,sheep milk,Sheep,Sheep,Other animals,Sheep and other animals
+19,Sheep - Lambs,Sheep,Lambs,15,10,30,53,0,0,0,0,0.03,0,0,0.45,0,0,0,0,2200,25,0.5,0.029,mutton,sheep milk,Sheep,Sheep,Other animals,Sheep and other animals
+20,Goats - Does,Goats,Does,53,10,30,53,0,60,0,0,0.106,8.374,0.09,0,1,3.2,5.8,970,2200,25,0.5,0.027,goat,goat milk,Goats,Goats,Other animals,Sheep and other animals
+21,Goats - Breeding Bucks,Goats,Breeding bucks,30,10,30,53,0,0,0,0,0.06,0,0,0.45,0,0,0,0,2200,25,0.5,0.027,goat,goat milk,Goats,Goats,Other animals,Sheep and other animals
+22,Goats - Fattening Bucks,Goats,Fattening bucks,20,10,30,53,0,0,0,0,0.04,0,0,0.45,0,0,0,0,2200,25,0.5,0.027,goat,goat milk,Goats,Goats,Other animals,Sheep and other animals
+23,Goats - Kids,Goats,Kids,15,10,30,53,0,0,0,0,0.03,0,0,0.45,0,0,0,0,2200,25,0.5,0.029,goat,goat milk,Goats,Goats,Other animals,Sheep and other animals
+24,Pigs - lactating/pregnant sows,Pigs,Lactating/pregnant sows,200,0,0,200,10,21,60,0.2,0.029782457,0.33396,0,0,0.5,0,0,0,2580,21,0.5,0.04,pork,N/A,N/A,Swine,Swine,"Cattle, pigs and poultry"
+25,Pigs - dry sows/boars,Pigs,Dry sows/boars,200,0,0,200,0,0,0,0,0.029782457,0,0,0,0,0,0,0,2580,21,0.5,0.04,pork,N/A,N/A,Swine,Swine,"Cattle, pigs and poultry"
+26,Pigs - growers,Pigs,Growers,80,0,0,200,0,0,0,0,0.014979783,0,0,0.05,0,0,0,0,2580,21,0.6,0.04,pork,N/A,N/A,Swine,Swine,"Cattle, pigs and poultry"

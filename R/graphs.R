@@ -14,6 +14,18 @@ color_palette <- c(
   "#CD6155", "#2874A6"
 )
 
+#' Colours for n categories (feeds, seasons)
+#'
+#' Uses the iCLEANED palette for the first 20 categories and adds further
+#' distinct colours when there are more, so plots work for any number of feeds.
+#'
+#' @param n Number of categories
+#' @return Character vector of n hex colours
+category_colors <- function(n) {
+  if (n <= length(color_palette)) return(color_palette[seq_len(n)])
+  c(color_palette, grDevices::hcl.colors(n - length(color_palette), palette = "Dark 3"))
+}
+
 # iCLEANED theme
 cleaned_theme <- theme_minimal() +
   theme(
@@ -191,7 +203,7 @@ plot_land_req <- function(data_table, unit, png = FALSE) {
   
   # Assign colors to each season based on the order of unique seasons
   season_colors <- setNames(
-    color_palette[seq_along(unique_seasons)], unique_seasons
+    category_colors(length(unique_seasons)), unique_seasons
   )
   
   data_table$bar_tooltip <- paste(
@@ -261,66 +273,147 @@ plot_land_req <- function(data_table, unit, png = FALSE) {
   )
 }
 
-#' Build char plot of Water per Feed
-#' 
-#' @param data_table data table to plot
-plot_water_feed <- function(data_table, unit, png = FALSE) {
-  
-  feed_water_percentage <- data_table %>%
-    mutate(percentage = feed_water_use / sum(feed_water_use)) %>%
-    pull(percentage)
-  
-  data_table$bar_tooltip <- paste(
-    '<div class="text-center px-1" style="font-size: 13px;">
-    <span class="lead fw-bold text-center" style="font-size: 13px;">', 
-    round(feed_water_percentage * 100, 2), "</span>", "<i> ", unit, "</i> <br>",
-    '<span class="text-center">', data_table$feed, "</span></div>"
+#' Prepare the slices of the water-use-per-feed pie
+#'
+#' Feeds without water use are left out. Feeds below `min_share` of the total
+#' are merged into one "Other feeds" slice (when there are at least two of
+#' them), so the pie stays readable for any number of feeds. Used by both the
+#' chart and its legend so they always match.
+#'
+#' @param data_table Water use per feed item (columns `feed`, `feed_water_use`)
+#' @param min_share Smallest share shown as its own slice (default 2%)
+#' @param other_label Label of the merged slice
+#'
+#' @return A data frame with one row per slice: `feed`, `feed_water_use`,
+#'   `share`, `color`, `members` (feeds in the slice, with their shares).
+water_feed_slices <- function(data_table, min_share = 0.02,
+                              other_label = "Other feeds") {
+  feeds <- unique(data_table$feed)
+  use <- vapply(feeds, function(f) {
+    sum(data_table$feed_water_use[data_table$feed == f], na.rm = TRUE)
+  }, numeric(1))
+  keep <- is.finite(use) & use > 0
+  feeds <- feeds[keep]
+  use <- use[keep]
+  if (length(feeds) == 0) {
+    return(data.frame(feed = character(0), feed_water_use = numeric(0),
+                      share = numeric(0), color = character(0),
+                      members = character(0), stringsAsFactors = FALSE))
+  }
+  # Largest feeds first, so the pie reads clockwise from the biggest slice
+  ord <- order(-use)
+  feeds <- feeds[ord]
+  use <- use[ord]
+  share <- use / sum(use)
+  small <- share < min_share
+  if (sum(small) < 2) small[] <- FALSE   # a single small feed keeps its own slice
+
+  slices <- data.frame(
+    feed = feeds[!small], feed_water_use = unname(use[!small]),
+    share = unname(share[!small]), stringsAsFactors = FALSE
   )
-  
-  # Create the interactive plot
-  p <- data_table %>%
-    ggplot(aes(x = "", y = feed_water_use, fill = feed)) +
-    geom_col_interactive(
-      aes(
-        color = feed, 
-        tooltip = bar_tooltip # Add tooltips
-      )
+  slices$color <- category_colors(nrow(slices))
+  slices$members <- slices$feed
+  if (any(small)) {
+    ord <- order(-share[small])
+    slices <- rbind(slices, data.frame(
+      feed = other_label,
+      feed_water_use = sum(use[small]),
+      share = sum(share[small]),
+      color = "#9E9E9E",
+      members = paste0(feeds[small][ord], ": ",
+                       format_percent(share[small][ord]), collapse = "<br>"),
+      stringsAsFactors = FALSE
+    ))
+  }
+  slices
+}
+
+# Percentages with one decimal (0.1% for very small non-zero shares)
+format_percent <- function(x) {
+  ifelse(x > 0 & x < 0.001, "<0.1%", sprintf("%.1f%%", 100 * x))
+}
+
+#' Build pie chart of water use per feed
+#'
+#' Slices are labelled outside the pie with a pointer line; small feeds are
+#' merged into "Other feeds" (see `water_feed_slices()`), whose tooltip lists
+#' them.
+#'
+#' @param data_table Water use per feed item
+#' @param unit Unit shown in the tooltip
+#' @param png TRUE for the downloadable image (title and legend added)
+plot_water_feed <- function(data_table, unit, png = FALSE) {
+
+  slices <- water_feed_slices(data_table)
+  if (nrow(slices) == 0) {
+    # No feed uses water: show an empty chart instead of an error
+    return(ggiraph::girafe(ggobj = ggplot() + theme_void(), width_svg = 11, height_svg = 8))
+  }
+  total <- sum(slices$feed_water_use)
+
+  # Slice positions: clockwise from 12 o'clock
+  slices$ymax <- cumsum(slices$feed_water_use)
+  slices$ymin <- slices$ymax - slices$feed_water_use
+  slices$ymid <- (slices$ymin + slices$ymax) / 2
+  angle <- 2 * pi * slices$ymid / total
+  slices$hjust <- ifelse(sin(angle) >= 0, 0, 1)   # right half left-aligned
+
+  # Labels sit outside the pie; consecutive narrow slices alternate between
+  # two distances so their labels do not overlap
+  narrow <- slices$share < 0.06
+  run <- ave(narrow, cumsum(!narrow), FUN = cumsum)
+  slices$label_x <- ifelse(narrow & run %% 2 == 0, 1.36, 1.16)
+  slices$label <- format_percent(slices$share)
+
+  slices$bar_tooltip <- paste0(
+    '<div class="text-center px-1" style="font-size: 13px;">',
+    '<span class="lead fw-bold text-center" style="font-size: 13px;">',
+    slices$label, "</span> <i>", unit, "</i><br>",
+    '<span class="text-center">',
+    ifelse(slices$feed == slices$members, slices$feed,
+           paste0("<b>", slices$feed, "</b><br>", slices$members)),
+    "</span></div>"
+  )
+
+  slices$feed <- factor(slices$feed, levels = slices$feed)
+  feed_colors <- setNames(slices$color, levels(slices$feed))
+
+  p <- ggplot(slices) +
+    geom_rect_interactive(
+      aes(xmin = 0, xmax = 1, ymin = ymin, ymax = ymax, fill = feed,
+          tooltip = bar_tooltip, data_id = feed),
+      color = "white", linewidth = 0.3
     ) +
-    coord_polar("y", start = 0) +
-    labs(x = "", y = "", title = "") +
-    
+    # Pointer from the edge of each slice to its label
+    geom_segment(
+      aes(x = 1.01, xend = label_x - 0.04, y = ymid, yend = ymid),
+      color = "#9E9E9E", linewidth = 0.3
+    ) +
     geom_text_interactive(
-      aes(x = 1.65, 
-          label = scales::percent(feed_water_use / sum(feed_water_use)), 
-          color = feed, 
-          tooltip = bar_tooltip),  # Add tooltips for text
-      position = position_stack(vjust = 0.5),
-      size = 6,
+      aes(x = label_x, y = ymid, label = label, hjust = hjust,
+          tooltip = bar_tooltip, data_id = feed),
+      color = "#333333",
+      size = 5,
       family = "Merriweather",
       fontface = "bold"
     ) +
-    # Apply the palette to the bar fill
-    scale_fill_manual(values = color_palette) +
-    # Apply the palette to the text color
-    scale_color_manual(values = color_palette)
-  
+    coord_polar(theta = "y", start = 0, clip = "off") +
+    scale_x_continuous(limits = c(0, 1.5)) +
+    scale_fill_manual(values = feed_colors) +
+    labs(x = "", y = "", title = "") +
+    theme_void()
+
   # if PNG then add title, unit and legend
   if (png) {
-    p <- p + labs(x = "", y = "", title = "Water Use per Feed") + 
-      theme(
-        legend.position = "bottom",
-        axis.text.x = element_blank(), # Remove x-axis text for the pie chart
-        axis.text.y = element_blank()
-      )
+    p <- p + labs(title = "Water Use per Feed", fill = NULL) +
+      theme(legend.position = "bottom")
     p
   } else {
-    p <- p + theme_void() +
-      theme(
-        legend.position = "none", # Remove legend
-        axis.text.x = element_blank(), # Remove x-axis text for the pie chart
-        axis.text.y = element_blank(),
-        plot.margin = unit(c(-.75, -.75, -.75, -.75), "cm")
-      )
+    p <- p + theme(
+      legend.position = "none", # The legend is shown next to the chart
+      plot.margin = unit(c(0, 0, 0, 0), "cm")
+    )
   }
   
   # Create the interactive plot
@@ -374,14 +467,42 @@ plot_comparison <- function(
     datos[[tt]] <- datos[[tt]] / 100
   }
   
-  p <- ggplot(datos, aes_string("scenario", y = tt)) + 
+  # Readable scenario names: underscores become spaces and long names wrap
+  # onto several lines; the wrap width shrinks as the number of bars grows
+  horizontal <- num_bars > 8
+  wrap_width <- if (horizontal) 30 else max(8, floor(70 / max(num_bars, 1)))
+  scenario_names <- unique(as.character(datos[["scenario"]]))
+  scenario_labels <- setNames(
+    wrap_labels(gsub("_", " ", scenario_names), width = wrap_width),
+    scenario_names
+  )
+  datos$scenario_label <- factor(
+    scenario_labels[as.character(datos[["scenario"]])],
+    levels = unique(scenario_labels)
+  )
+
+  p <- ggplot(datos, aes(x = scenario_label, y = .data[[tt]])) + 
     geom_bar_interactive(
       aes(tooltip = bar_tooltip), 
       stat = "identity", fill = "#005275", width = bar_width
     ) +
     labs(x = "", y = "", title = "") +
-    cleaned_theme +
-    theme(axis.text.x = element_text(hjust = 0.5, vjust = 1))
+    cleaned_theme
+
+  if (horizontal) {
+    # Many scenarios: horizontal bars, names on the left, first scenario on top
+    p <- p +
+      scale_x_discrete(limits = rev) +
+      coord_flip() +
+      theme(
+        axis.text.y = element_text(hjust = 1, vjust = 0.5, margin = margin(r = 8)),
+        axis.text.x = element_text(hjust = 0.5),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_line(colour = "#CDCDCD")
+      )
+  } else {
+    p <- p + theme(axis.text.x = element_text(hjust = 0.5, vjust = 1, lineheight = 1))
+  }
   
   # Conditionally apply scale_y_continuous if all values are non-negative
   if (all(datos[, tt] >= 0, na.rm = TRUE)) {

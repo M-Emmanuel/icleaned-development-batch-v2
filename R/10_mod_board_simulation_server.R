@@ -188,65 +188,83 @@ board_simulation_server <- function(
         )
         
         # TODO: correct this in the R package instead! (See Backlog) - quick fix
-        environment(n_balance) <- environment()
-        environment(ghg_emission) <- environment()
-        environment(combineOutputs) <- environment() # nolint: object_name_linter
+        # These functions look names up here first; they also need the CLEANED
+        # package's internal helpers (e.g. the second manure management system),
+        # so those are made available too.
+        sim_env <- new.env(parent = environment())
+        list2env(as.list(asNamespace("cleaned"), all.names = TRUE), envir = sim_env)
+        environment(n_balance) <- sim_env
+        environment(ghg_emission) <- sim_env
+        environment(combineOutputs) <- sim_env # nolint: object_name_linter
         
         # Intermediate calculation ---------------------------------------------
-        feed_basket_quality <- feed_quality(para = para)
-        # energy required
-        energy_required <- energy_requirement(
-          para = para,
-          feed_basket_quality = feed_basket_quality,
-          energy_parameters = energy_parameters
-        )
-        # land required
-        land_required <- land_requirement(
-          feed_basket_quality = feed_basket_quality,
-          energy_required = energy_required,
-          para = para
-        )
-        # soil erosion
-        soil_erosion <- soil_health(
-          para = para,
-          land_required = land_required
-        )
-        # water required
-        water_required <- water_requirement(
-          para = para,
-          land_required = land_required
-        )
-        # nitrogen balance
-        nitrogen_balance <- n_balance(
-          para = para,
-          land_required = land_required,
-          soil_erosion = soil_erosion
-        )
-        # livestock productivity
-        livestock_productivity <- land_productivity(
-          para = para,
-          energy_required = energy_required
-        )
-        # biomass
-        biomass <- biomass_calculation(
-          para = para,
-          land_required = land_required
-        )
-        # soil carbon
-        soil_carbon <- soil_organic_carbon(
-          para = para,
-          stock_change_para = stock_change_para,
-          land_required = land_required,
-          biomass = biomass
-        )
-        # GHG emissions
-        ghg_emissions <- ghg_emission(
-          para = para,
-          energy_required = energy_required,
-          ghg_ipcc_data = ghg_ipcc_data,
-          land_required = land_required,
-          nitrogen_balance = nitrogen_balance
-        )
+        # Errors (e.g. a livestock type without species/class or IPCC
+        # categories) are shown to the user instead of stopping the session
+        simulation_error <- tryCatch({
+          feed_basket_quality <- feed_quality(para = para)
+          # energy required
+          energy_required <- energy_requirement(
+            para = para,
+            feed_basket_quality = feed_basket_quality,
+            energy_parameters = energy_parameters
+          )
+          # land required
+          land_required <- land_requirement(
+            feed_basket_quality = feed_basket_quality,
+            energy_required = energy_required,
+            para = para
+          )
+          # soil erosion
+          soil_erosion <- soil_health(
+            para = para,
+            land_required = land_required
+          )
+          # water required
+          water_required <- water_requirement(
+            para = para,
+            land_required = land_required
+          )
+          # nitrogen balance
+          nitrogen_balance <- n_balance(
+            para = para,
+            land_required = land_required,
+            soil_erosion = soil_erosion
+          )
+          # livestock productivity
+          livestock_productivity <- land_productivity(
+            para = para,
+            energy_required = energy_required
+          )
+          # biomass
+          biomass <- biomass_calculation(
+            para = para,
+            land_required = land_required
+          )
+          # soil carbon
+          soil_carbon <- soil_organic_carbon(
+            para = para,
+            stock_change_para = stock_change_para,
+            land_required = land_required,
+            biomass = biomass
+          )
+          # GHG emissions
+          ghg_emissions <- ghg_emission(
+            para = para,
+            energy_required = energy_required,
+            ghg_ipcc_data = ghg_ipcc_data,
+            land_required = land_required,
+            nitrogen_balance = nitrogen_balance
+          )
+          NULL
+        }, error = function(e) conditionMessage(e))
+        if (!is.null(simulation_error)) {
+          showNotification(
+            paste0("Scenario '", json_file_name, "' could not be simulated: ", simulation_error),
+            duration = NULL,
+            type = "error"
+          )
+          return(NULL)
+        }
         
         # Add dry matter intake checks -----------------------------------------
         # Convert to daily intake
@@ -560,11 +578,6 @@ board_simulation_server <- function(
     req(input$scenario_name)
     cat(file = stderr(), "10 - Plot Water Use per Feed\n")
     
-    # hide all the feeds legend items
-    lapply(1:max_feed_items, function(i) {
-      shinyjs::hide(id = paste0("Feeds_LegendItemtxt_", i))
-    })
-    
     # Read the data
     water_use_per_feed_item <- readRDS(
       file.path(
@@ -573,16 +586,12 @@ board_simulation_server <- function(
       )
     )[["water_use_per_feed_item"]]
     
-    # unique feeds
-    feeds <- unique(water_use_per_feed_item$feed)
-    
-    # display the legend according to the feeds
-    lapply(seq_along(feeds), function(i) {
-      # Show the hidden column
-      shinyjs::show(id = paste0("Feeds_LegendItemtxt_", i))
-      # Update the p tag content
-      shinyjs::html(id = paste0("Feeds_LegendItemtxt_", i), html = feeds[i]) 
-    })
+    # Legend with the same slices and colours as the pie chart
+    slices <- water_feed_slices(water_use_per_feed_item)
+    shinyjs::html(
+      id = "legend_2",
+      html = as.character(legend_items(slices$feed, slices$color))
+    )
     
     unit <- graphs_desc[graphs_desc$indicator == "water_feed", ]$unit
     plot_water_feed(water_use_per_feed_item, unit)

@@ -28,7 +28,7 @@ feedtype_colnames <- c(
   "Main product dry yield (t DM/ha)",
   "Residue dry yield (t DM/ha)",
   "Main product N content (kg N/kg DM)",
-  "Reside N content (kg N/kg DM)",
+  "Residue N content (kg N/kg DM)",
   "Kc: Initial",
   "Kc: MidSeason",
   "Kc: Late",
@@ -53,6 +53,8 @@ feedtype_colnames <- c(
 livestock_table_colnames <- c(
   "", # For the delete_row column
   "Category",
+  "Species",
+  "Animal class",
   "Number",
   "Average annual milk production (kg/animal)",
   "Average annual wool production (kg/animal)",
@@ -60,16 +62,28 @@ livestock_table_colnames <- c(
   "Time spent in stable (fraction of day)",
   "Collection of manure in stable (fraction)",
   "Manure management in stable",
+  "Share 1 stable",
+  "Second manure management in stable (optional)",
+  "Share of the stable manure under the second management (fraction)",
   "Time spent in non-roofed enclosure  (fraction of day)",
   "Collection of manure in non-roofed enclosure (fraction)",
   "Manure management in non-roofed enclosure",
+  "Share 1 non_roofed_enclosure",
+  "Second manure management in non-roofed enclosure (optional)",
+  "Share of the non-roofed enclosure manure under the second management (fraction)",
   "Time spent grazing  pasture/fields on-farm (fraction of day)",
   "Collection of manure in fields/pasture (fraction)",
   "Manure management during on-farm grazing",
+  "Share 1 onfarm_grazing",
+  "Second manure management in on-farm grazing (optional)",
+  "Share of the on-farm grazing manure under the second management (fraction)",
   "Time spent grazing off-farm (fraction of day)",
   "Manure management during off-farm grazing",
+  "Share 1 offfarm_grazing",
+  "Second manure management in off-farm grazing (optional)",
+  "Share of the off-farm grazing manure under the second management (fraction)",
   "Distance stable / enclosure to pasture (km)",
-  "Collection of manure during off-farm grazing (fraction)",
+  "Fraction of collected manure used on the farm",
   "Fraction of collected manure being sold",
   "Average Body weight (kg)",
   "The live bodyweight at weaning (kgs)",
@@ -78,15 +92,12 @@ livestock_table_colnames <- c(
   "The mature body weight of an adult animal (kgs)",
   "Work animals (hours/day/animal)",
   "Litter size  (pigs)",
-  "Number of piglets relying on milk",
+  "Piglets relying on milk (% of the litter)",
   "Lactation length (small ruminants/pigs, days)",
   "Proportion growth piglets covered by milk (%)",
   "LW gain piglets (kg/day)",
-  "Grazing displacement (km/day)",
   "Crude Protein/Lysine requirement maintenance (kg/day)",
-  "Crude Protein requirement grazing (kg/km)",
   "Crude Protein/ Lysine requirement pregnancy (kg)",
-  "Crude Protein/ Lysine requirement lactation (kg/ lactation)",
   "Crude Protein requirement  (kg/kg milk)",
   "Crude Protein/ Lysine requirement growth (kg/kg LWG)",
   "Parturition interval (years)",
@@ -96,14 +107,13 @@ livestock_table_colnames <- c(
   "Energy content meat",
   "Protein content meat (%)",
   "Carcass fraction",
-  "Energy content eggs",
   "Average N content manure",
   "Meat product",
   "Milk product",
-  "Methane emissions enteric fermentation - Tier 1",
-  "Methane emissions enteric fermentation - Tier 2",
-  "Methane emissions manure - Tier 1",
-  "Default N-excretion rates Tier 1"
+  "Enteric methane category (IPCC Tier 2, Ym)",
+  "Manure methane category (IPCC Table 10.16, Bo)",
+  "Manure N loss category (IPCC Table 10.22)",
+  "Pasture N2O group (IPCC Table 11.1, EF3PRP)"
 )
 
 crop_inputs_table_colnames <- c(
@@ -138,6 +148,8 @@ fertilizers_initialization <- data.frame(
 livestock_data_initialization <- data.frame(
   livetype_code = character(),
   livetype_desc = character(),
+  species = character(),
+  animal_class = character(),
   herd_composition = numeric(),
   annual_milk = numeric(),
   annual_wool = numeric(),
@@ -145,14 +157,26 @@ livestock_data_initialization <- data.frame(
   time_in_stable = numeric(),
   manure_in_stable = numeric(),
   manureman_stable = character(),
+  manure_share_1_stable = numeric(),
+  manureman_2_stable = character(),
+  manure_share_2_stable = numeric(),
   time_in_non_roofed_enclosure = numeric(),
   manure_in_non_roofed_enclosure = numeric(),
   manureman_non_roofed_enclosure = character(),
+  manure_share_1_non_roofed_enclosure = numeric(),
+  manureman_2_non_roofed_enclosure = character(),
+  manure_share_2_non_roofed_enclosure = numeric(),
   time_in_onfarm_grazing = numeric(),
   manure_in_field = numeric(),
   manureman_onfarm_grazing = character(),
+  manure_share_1_onfarm_grazing = numeric(),
+  manureman_2_onfarm_grazing = character(),
+  manure_share_2_onfarm_grazing = numeric(),
   time_in_offfarm_grazing = numeric(),
   manureman_offfarm_grazing = character(),
+  manure_share_1_offfarm_grazing = numeric(),
+  manureman_2_offfarm_grazing = character(),
+  manure_share_2_offfarm_grazing = numeric(),
   distance_to_pasture = numeric(),
   manure_onfarm_fraction = numeric(),
   manure_sales_fraction = numeric(),
@@ -164,38 +188,79 @@ livestock_data_initialization <- data.frame(
   litter_size = numeric(),
   piglets_relying_on_milk = numeric(),
   lactation_length = numeric(),
-  proportion_growth = numeric(),
-  lw_gain = numeric(),
-  grazing_displacement = numeric(),
+  proportion_growth_piglets_milk = numeric(),
+  lw_gain_piglets = numeric(),
   cp_maintenance = numeric(),
-  cp_grazing = numeric(),
-  cp_pregnancy = numeric(),
-  cp_lactation = numeric(),
+  cp_lys_pregnancy = numeric(),
   cp_lactmilk = numeric(),
-  cp_growth = numeric(),
+  cp_lys_growth = numeric(),
   birth_interval = numeric(),
   protein_milkcontent = numeric(),
-  fat_content = numeric(),
+  fat_milkcontent = numeric(),
   energy_milkcontent = numeric(),
   energy_meatcontent = numeric(),
   protein_meatcontent = numeric(),
   carcass_fraction = numeric(),
-  energy_eggcontent = numeric(),
-  n_content = numeric(),
+  n_manure_content = numeric(),
   meat_product = character(),
   milk_product = character(),
-  ipcc_ef_category_t1 = character(),
   ipcc_ef_category_t2 = character(),
-  ipcc_meth_man_category = character(),
-  ipcc_n_exc_category = character(),
+  ipcc_manure_ch4_category = character(),
+  ipcc_n_loss_category = character(),
+  ipcc_prp_category = character(),
   stringsAsFactors = FALSE
 )
 
+# Column order of the livestock table: the time in each place first, then the
+# manure of each place (shown only for places where the animals spend time)
+# (per place: system option 1, its fraction, system option 2, its fraction, collection)
+livestock_place_blocks <- list(
+  stable = c("manureman_stable", "manure_share_1_stable", "manureman_2_stable", "manure_share_2_stable",
+             "manure_in_stable"),
+  non_roofed_enclosure = c("manureman_non_roofed_enclosure", "manure_share_1_non_roofed_enclosure",
+                           "manureman_2_non_roofed_enclosure", "manure_share_2_non_roofed_enclosure",
+                           "manure_in_non_roofed_enclosure"),
+  onfarm_grazing = c("manureman_onfarm_grazing", "manure_share_1_onfarm_grazing", "manureman_2_onfarm_grazing",
+                     "manure_share_2_onfarm_grazing", "manure_in_field"),
+  offfarm_grazing = c("manureman_offfarm_grazing", "manure_share_1_offfarm_grazing",
+                      "manureman_2_offfarm_grazing", "manure_share_2_offfarm_grazing")
+)
+livestock_place_labels <- c(stable = "in stable", non_roofed_enclosure = "in non-roofed enclosure",
+                            onfarm_grazing = "during on-farm grazing", offfarm_grazing = "during off-farm grazing")
+local({
+  time_cols <- paste0("time_in_", names(livestock_place_blocks))
+  # species, animal class and the IPCC categories are livestock parameters:
+  # they come last, together (orange section)
+  categories <- c("species", "animal_class", "ipcc_ef_category_t2", "ipcc_manure_ch4_category",
+                  "ipcc_n_loss_category", "ipcc_prp_category")
+  first <- setdiff(names(livestock_data_initialization)[seq_len(match("annual_growth", names(livestock_data_initialization)))],
+                   categories)
+  manure <- c(unlist(livestock_place_blocks, use.names = FALSE), "manure_onfarm_fraction", "manure_sales_fraction")
+  order <- c(first, time_cols, "distance_to_pasture", manure)
+  order <- c(order, setdiff(names(livestock_data_initialization), c(order, categories)), categories)
+  # labels follow their columns (label k belongs to column k)
+  label_of <- stats::setNames(livestock_table_colnames, names(livestock_data_initialization))
+  livestock_data_initialization <<- livestock_data_initialization[, order]
+  labels <- unname(label_of[order])
+  # the two management options of each place and their fractions
+  for (place in names(livestock_place_blocks)) {
+    where <- livestock_place_labels[[place]]
+    labels[match(c(paste0("manureman_", place), paste0("manure_share_1_", place),
+                   paste0("manureman_2_", place), paste0("manure_share_2_", place)), order)] <- c(
+      paste("Manure management", where, "- option 1"),
+      paste("Fraction of the manure", where, "under option 1"),
+      paste("Manure management", where, "- option 2 (optional)"),
+      paste("Fraction of the manure", where, "under option 2"))
+  }
+  labels[1] <- ""
+  livestock_table_colnames <<- labels
+})
+
 feedtype_initialization <- data.frame(
-  feed_type_code = numeric(),
+  crop_code = numeric(),
   feed_item_code = numeric(),
   feed_item_name = character(),
-  feed_type_name = character(),
+  crop_name = character(),
   source_type = character(),
   intercrop = numeric(),
   intercrop_fraction = numeric(),
@@ -219,7 +284,7 @@ feedtype_initialization <- data.frame(
   slope_p_factor = numeric(),
   dry_yield = numeric(),
   residue_dry_yield = numeric(),
-  n_content = numeric(),
+  main_n = numeric(),
   residue_n = numeric(),
   kc_initial = numeric(),
   kc_midseason = numeric(),
@@ -244,7 +309,6 @@ feedtype_initialization <- data.frame(
   # These ones are available in the json but not in the DT
   fraction_as_manure = character(),
   n_fertilizer = character(),
-  main_n = numeric(),
   land_cover = character(),
   slope = character(),
   grassman = character(),
@@ -265,6 +329,58 @@ crop_inputs_data_initialization <- data.frame(
   ammonia = numeric(),
   stringsAsFactors = FALSE
 )
+
+# Columns synced from the parameters database into the scenario state ---------
+# When the parameters database changes (or a scenario is loaded), these columns
+# are refreshed from the matching row in the parameters DB (matched by code).
+# User-edited columns that are NOT listed here are preserved as-is.
+
+feedtype_sync_cols_lkp_crops <- c(
+  "crop_name", "dry_yield", "residue_dry_yield", "main_n", "residue_n",
+  "kc_initial", "kc_midseason", "kc_late", "category",
+  "trees_ha", "trees_dhb", "trees_growth", "trees_removal",
+  "trees_ha_dbh25", "average_dbh25", "increase_dbh25",
+  "trees_ha_dbh2550", "average_dbh2550", "increase_dbh2550",
+  "trees_ha_dbh50", "average_dbh50", "increase_dbh50",
+  "time_horizon", "diameter_breast"
+)
+
+# (crop_code too: the crop of a feed is the one the parameters database gives it)
+feedtype_sync_cols_lkp_feeditem <- c(
+  "feed_item_name", "crop_code", "dm_content", "me_content", "cp_content"
+)
+
+# Named vector: target column name = source column name (enables renaming).
+livestock_sync_cols_lkp_livetype <- c(
+  "livetype_desc"                  = "livetype_desc",
+  "body_weight"                    = "body_weight",
+  "litter_size"                    = "litter_size",
+  "lactation_length"               = "lactation_length",
+  "proportion_growth_piglets_milk" = "proportion_growth_piglets_milk",
+  "lw_gain_piglets"                = "lw_gain_piglets",
+  "cp_maintenance"                 = "cp_maintenance",
+  "cp_lys_pregnancy"               = "cp_lys_pregnancy",
+  "cp_lactmilk"                    = "cp_lactmilk",
+  "cp_lys_growth"                  = "cp_lys_growth",
+  "birth_interval"                 = "birth_interval",
+  "protein_milkcontent"            = "protein_milkcontent",
+  "fat_milkcontent"                = "fat_milkcontent",
+  "energy_milkcontent"             = "energy_milkcontent",
+  "energy_meatcontent"             = "energy_meatcontent",
+  "protein_meatcontent"            = "protein_meatcontent",
+  "carcass_fraction"               = "carcass_fraction",
+  "n_manure_content"               = "n_manure_content",
+  "meat_product"                   = "meat_product",
+  "milk_product"                   = "milk_product",
+  "species"                        = "species",
+  "animal_class"                   = "animal_class",
+  "ipcc_ef_category_t2"            = "ipcc_ef_category_t2",
+  "ipcc_manure_ch4_category"       = "ipcc_manure_ch4_category",
+  "ipcc_n_loss_category"           = "ipcc_n_loss_category",
+  "ipcc_prp_category"              = "ipcc_prp_category"
+)
+# (the sync works both ways: these columns edited in a scenario are written
+# back to the scenario's parameters database, see push_parameter_value())
 
 # Define the list of inputs for saving & loading -------------------------------
 
@@ -289,8 +405,17 @@ manure_cols <- c(
   "manureman_stable",
   "manureman_non_roofed_enclosure",
   "manureman_onfarm_grazing",
-  "manureman_offfarm_grazing"
+  "manureman_offfarm_grazing",
+  # a second system for a share of the manure of the place (optional)
+  "manureman_2_stable",
+  "manureman_2_non_roofed_enclosure",
+  "manureman_2_onfarm_grazing",
+  "manureman_2_offfarm_grazing"
 )
+manure_second_cols <- grep("^manureman_2_", manure_cols, value = TRUE)
+manure_share_cols <- sub("^manureman_2_", "manure_share_2_", manure_second_cols)
+manure_share_1_cols <- sub("^manureman_2_", "manure_share_1_", manure_second_cols)
+manure_none_label <- "None"
 
 # Named vector for hard coded percentage_n values ------------------------------
 fertilizer_percentages <- c(
@@ -302,31 +427,34 @@ fertilizer_percentages <- c(
   "Ammonia" = 82
 )
 
-# Water regime SelectInput options ---------------------------------------------
-water_regime_options <- c(
-  "Non-flooded pre-season <180 days( often in double cropping of rice)",
-  "Non-flooded pre-season >180 days (single rice crop following a dry fallow period)",
-  "Flooded pre-season (>30)"
+# Fertilizer name to column mapping --------------------------------------------
+# Maps fertilizer names from the 'Farm > Fertilizer' tab to their corresponding
+# column names in the 'Crop Inputs' dataframe. Used to dynamically identify
+# and control column editability.
+fertilizer_column_mapping <- c(
+  "Urea" = "urea",
+  "NPK" = "npk",
+  "DAP" = "dap",
+  "Ammonium nitrate" = "ammonium_nitrate",
+  "Ammonium sulfate" = "ammonium_sulfate",
+  "N solutions" = "n_solutions",
+  "Ammonia" = "ammonia"
 )
 
-# Ecosystem type SelectInput options -------------------------------------------
-rice_ecosystem_options <- c(
-  "Irrigated - continuously flooded",
-  "Irrigated - intermittently flooded-single aeration",
-  "Irrigated - Intermittently flooded-multiple aeration",
-  "Rainfed - regular rainfed",
-  "Rainfed - drought prone",
-  "Rainfed - deep water",
-  "Upland",
-  "None"
+# Rice settings: the values of IPCC tables 5.12-5.14, which the model looks the
+# factors up with (the same lists as the batch Excel template's dropdowns) ------
+rice_ipcc_fallback <- list(
+  ecosystem_type = c("Irrigated-Continuously flooded", "intermittently flooded-single aeration",
+                     "Intermittently flooded-multiple aeration", "Rainfed-regular rainfed",
+                     "Rainfed-drought prone", "Rainfed-deep water", "Upland", "None"),
+  water_regime = c("non-flooded pre-season <180 days( often in double cropping of rice)",
+                   "non-flooded pre-season >180 days (single rice crop following a dry fallow period)",
+                   "flooded pre-season (>30 days)", "flooded pre-season (<30 days)", "None"),
+  organic_amendment = c("straw incorporated in soil shortly (<30 days) before cultivation",
+                        "straw incorporated in soil long (>30 days) before cultivation",
+                        "Compost", "Farm yard manure", "green manure", "None")
 )
-
-# Organic amendment SelectInput options ----------------------------------------
-rice_organic_amendment_options <- c(
-  "Straw incorporated in soil shortly (<30 days) before cultivation",
-  "Straw incorporated in soil long (>30 days) before cultivation",
-  "Compost",
-  "Farm yard manure",
-  "Green manure",
-  "None"
-)
+rice_ipcc_lists <- tryCatch(cleaned::rice_options(), error = function(e) rice_ipcc_fallback)
+water_regime_options <- rice_ipcc_lists$water_regime
+rice_ecosystem_options <- rice_ipcc_lists$ecosystem_type
+rice_organic_amendment_options <- rice_ipcc_lists$organic_amendment
