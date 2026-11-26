@@ -1,3 +1,7 @@
+# Settings in a .Renviron file next to the app (e.g. a test copy published with
+# deploy/deploy_shinyapps.R) are read first
+if (file.exists(".Renviron")) readRenviron(".Renviron")
+
 library(data.table)
 library(shiny)
 library(ggplot2)

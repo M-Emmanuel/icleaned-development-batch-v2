@@ -1,95 +1,73 @@
-# Publishing a test copy of iCLEANED on shinyapps.io
+# Publishing a test copy of iCLEANED on Posit Connect Cloud
 
-These steps publish the app with CLEANED 0.20.0 on a free shinyapps.io account, so
-testers only need a link. Steps 1 and 2 are done once; step 4 is repeated after each
-change.
+Posit is replacing shinyapps.io with **Posit Connect Cloud** (shinyapps.io apps are
+moved there from January 2027), so the test copy is published on Connect Cloud. The
+free plan allows up to 5 apps, 4 GB of memory, and public apps only.
 
-## 1. Put both on GitHub (your forks)
+## 1. Put both on GitHub (once)
 
-shinyapps.io installs R packages only from CRAN or GitHub, so CLEANED 0.20.0 must be
-on GitHub.
+Connect Cloud installs R packages from CRAN or GitHub, so the new CLEANED must be on
+GitHub, in a **public** repository on the free plan:
 
-1. On GitHub, fork the CLEANED repository (CIAT/cleaned) and the iCLEANED app repository.
-2. Clone each fork and make a branch, for example `batch-testing`:
+- package: `M-Emmanuel/cleaned-staging-v2`, branch `feature/correct-functions`;
+- app: `M-Emmanuel/icleaned-development-batch-v2`, branch `batch-testing`.
 
-   ```
-   git clone https://github.com/<you>/cleaned.git
-   cd cleaned
-   git checkout -b batch-testing
-   ```
+Never commit a `.Renviron` file (it is in `.gitignore`): it can hold Auth0 keys.
 
-3. Copy the content of `cleaned-staging-updated.zip` into the package clone (replace
-   the files), and the content of `icleaned-staging-updated.zip` into the app clone.
-   Delete the stray file `offfarm_grazing` in the package folder.
-4. Check what changed, then commit and push (do the same for the app):
+## 2. Connect RStudio to Connect Cloud (once)
 
-   ```
-   git status
-   git add -A
-   git commit -m "CLEANED 0.20.0: batch processing, farmer survey, livestock categories"
-   git push -u origin batch-testing
+1. Sign in at https://connect.posit.cloud (with GitHub is easiest).
+2. In RStudio, update rsconnect and restart R:
+
+   ```r
+   install.packages("rsconnect")
    ```
 
-   Never commit a `.Renviron` file (it is in `.gitignore`): it can hold Auth0 keys.
+3. Run `rsconnect::connectCloudUser()`. A browser window opens: sign in and allow
+   access. `rsconnect::accounts()` then lists your Connect Cloud account.
 
-## 2. Connect your shinyapps.io account to R
+No token has to be copied: the sign-in happens in the browser.
 
-1. Sign up at https://www.shinyapps.io (free plan).
-2. Open **Account > Tokens > Add token > Show**, then **Show secret**, and copy the
-   `rsconnect::setAccountInfo(name = ..., token = ..., secret = ...)` command.
-3. Paste it once in the RStudio console and run it. Keep the token and secret private:
-   do not put them in a script or on GitHub.
+## 3. Publish
 
-## 3. Check the settings of the deploy script
-
-Open `deploy/deploy_shinyapps.R` in the app clone and set:
-
-- `account`: your shinyapps.io account name;
-- `app_name`: for example `icleaned-test` (the link will be
-  `https://<account>.shinyapps.io/icleaned-test/`);
-- `cleaned_github`: your fork and branch, for example `M-Emmanuel/cleaned@batch-testing`.
-
-## 4. Publish
-
-Open `icleaned.Rproj` in RStudio and run:
+Open `icleaned.Rproj` (the app clone) in RStudio and run:
 
 ```r
 source("deploy/deploy_shinyapps.R")
 ```
 
-The script installs CLEANED from GitHub, checks its version, copies the app with the
-test settings into a temporary folder and publishes it. The first publication takes
-5 to 15 minutes (shinyapps.io installs all packages); the app opens when it is ready.
+The script installs CLEANED from GitHub (`cleaned_github` at the top of the script),
+checks that it has batch processing, puts a copy of the app with the test settings in
+`deploy/bundle` and publishes it. The first publication takes 5 to 15 minutes (all
+packages are installed); the app opens when it is ready. Share the link it shows.
 
-After a change: push it to GitHub, then run the script again.
+After a change: push it to GitHub, then run the script again. The same app is updated
+(the record is kept in `deploy/bundle/rsconnect`, which is not committed).
 
-## 5. Settings on shinyapps.io (once)
-
-In the dashboard, open the app, then **Settings**:
-
-- **General > Instance idle timeout**: set the longest value offered, so a batch is not
-  stopped while it runs.
-- **Advanced > Max worker processes**: 1, so that all testers share the same data folder.
+The test settings are in `deploy/bundle/.Renviron` and are read by `global.R` at
+start-up: no login (`AUTH0_ENABLED=false`), the Batch page shown
+(`ICLEANED_BATCH=true`), and a data folder created in the app (`ICLEANED_DATA_INIT=true`,
+`DATA_DIR=icleaned_data`). The same variables can also be set in Connect Cloud under the
+app's **Settings > Variables**.
 
 ## What testers should know
 
 - **No login**: everyone uses the same test user and sees each other's scenarios,
   databases and batches. The first visitor sees the onboarding questions.
-- **Temporary data**: everything is lost when the app restarts (after being idle) or is
-  published again. Download anything you want to keep.
-- **Free plan limits**: 1 GB of memory and 25 active hours a month. Use batches of up to
-  about 50 farms; larger batches may run out of memory.
+- **Temporary data**: anything saved may be lost when the app restarts or is published
+  again. Download what you want to keep.
+- Use batches of up to about 50 farms first.
 - Report problems with the step number of the test plan, the time, and a screenshot.
 
 ## If something goes wrong
 
-- *"CLEANED was not installed from GitHub"*: check `cleaned_github` (account, repository
-  and branch) and that the branch was pushed.
-- *Package installation fails on shinyapps.io*: open **Logs** in the dashboard; the
-  package named there must be installable from CRAN or GitHub.
-- *The app starts but shows an error page about DATA_DIR*: the `.Renviron` made by the
-  script was not published; run the script again from the app folder.
-- *To use Auth0 logins instead*: add `https://<account>.shinyapps.io/<app_name>/` to the
-  allowed callback and logout URLs of the Auth0 application, and publish with
-  `AUTH0_ENABLED=true` plus `AUTH0_USER`, `AUTH0_KEY` and `AUTH0_SECRET` in the
-  `.Renviron` written by the script (never committed to GitHub).
+- *"CLEANED was not installed from GitHub"*: check `cleaned_github` (account,
+  repository, branch) and that the branch was pushed.
+- *Publication fails while installing packages*: open the app's logs in Connect Cloud;
+  the package named there must be installable from CRAN or a public GitHub repository.
+- *The app shows an error page about DATA_DIR*: the settings were not read; add the
+  variables above under **Settings > Variables** in Connect Cloud and restart the app.
+- *To use Auth0 logins instead*: add the app's Connect Cloud address to the allowed
+  callback and logout URLs of the Auth0 application, and set `AUTH0_ENABLED=true`,
+  `AUTH0_USER`, `AUTH0_KEY`, `AUTH0_SECRET` and `APP_URL` as secret variables in Connect
+  Cloud (never in GitHub).
