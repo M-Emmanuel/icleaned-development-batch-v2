@@ -101,16 +101,8 @@ server <- function(input, output, session) {
           modalDialog(
             title = "Onboarding Questions",
             easyClose = FALSE,
-            lapply(questions_data$questions, function(q) {
-              tagList(
-                h2(q$question, class = "mb-3 mt-3"),
-                textAreaInput(
-                  inputId = q$id,
-                  label = NULL,
-                  height = "75px"
-                )
-              )
-            }),
+            p("Please answer each question by choosing from its list."),
+            lapply(questions_data$questions, onboarding_question_ui),
             footer = tagList(
               actionButton("ok_onboarding", "Submit")
             )
@@ -204,13 +196,22 @@ server <- function(input, output, session) {
     # Load onboarding questions from the YAML configuration file
     onboarding_questions <- yaml::read_yaml("onboarding_questions.yaml")
     
-    # Capture new user responses from the form inputs
-    user_responses <- sapply(onboarding_questions$questions, function(question) {
-      input[[question$id]]
-    })
+    # Capture new user responses from the form inputs (several answers to one
+    # question are separated by "; ")
+    user_responses <- vapply(onboarding_questions$questions, function(question) {
+      paste(input[[question$id]], collapse = "; ")
+    }, character(1))
     
-    # Retrieve the current user's email from the session data
+    # Every question must be answered
+    if (any(!nzchar(trimws(user_responses)))) {
+      showNotification("Please answer every question before submitting.", type = "warning")
+      return()
+    }
+    
+    # Retrieve the current user's email from the session data (without login,
+    # e.g. a test copy, the name of the user folder)
     user_email <- session$userData$auth0_info$name
+    if (is.null(user_email)) user_email <- basename(session$userData$user_folder %||% "unknown")
     
     # Extract the current question texts (to be used as column names)
     question_texts <- sapply(onboarding_questions$questions, function(question) {

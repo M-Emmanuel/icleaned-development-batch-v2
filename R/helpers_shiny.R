@@ -392,3 +392,41 @@ versioned_copy <- function(
   # Return the path of the new copy
   return(destination_path)
 }
+
+#' One onboarding question (see onboarding_questions.yaml)
+#'
+#' A question with `choices` (or `choice_groups`, choices under headings) is a
+#' dropdown: one answer (`type: single`) or several (`type: multiple`), chosen
+#' from the list only, so the answers can be compared. A question without
+#' choices is a text box.
+#'
+#' @param q One question from the YAML file (id, question, type, choices,
+#'   choice_groups, hint)
+#' @return A tagList with the question and its input
+onboarding_question_ui <- function(q) {
+  choices <- if (!is.null(q$choice_groups)) {
+    lapply(q$choice_groups, unlist)
+  } else if (!is.null(q$choices)) {
+    unlist(q$choices)
+  }
+  input <- if (is.null(choices)) {
+    textAreaInput(inputId = q$id, label = NULL, height = "75px")
+  } else {
+    single <- !identical(q$type, "multiple")
+    # (typing filters the list; only listed answers can be chosen)
+    selectizeInput(
+      inputId = q$id, label = NULL, choices = choices, multiple = TRUE, selected = character(0),
+      width = "100%",
+      options = Filter(Negate(is.null), list(
+        maxItems = if (single) 1 else NULL,
+        placeholder = if (single) "Choose one" else "Choose one or more",
+        create = FALSE, plugins = if (!single) list("remove_button")
+      ))
+    )
+  }
+  tagList(
+    h2(q$question, class = "mb-3 mt-3"),
+    if (!is.null(q$hint)) p(class = "text-muted mb-2", q$hint),
+    input
+  )
+}
